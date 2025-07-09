@@ -28,11 +28,11 @@ x-airflow-common:
     _AIRFLOW_WWW_USER_PASSWORD: airflow
     _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow==2.7.0 dbt-core dbt-trino trino airflow-dbt
   volumes:
-    - ./dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-./airflow}/plugins:/opt/airflow/plugins
     - ./dbts:/opt/airflow/dbts
     - ./docker/airflow/config:/opt/airflow/config
-    - ./docker/airflow/plugins:/opt/airflow/plugins
-    - ./docker/volume/airflow/logs:/opt/airflow/logs
   user: "50000"
   depends_on:
     &airflow-common-depends-on
@@ -119,6 +119,27 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  ####################################################################################################
+  # Dremio
+  ####################################################################################################
+  dremio:
+    profiles: ["dremio"]
+    image: dremio/dremio-oss:26.0.0
+    container_name: lakehouse-playground-dremio
+    hostname: dremio
+    restart: always
+    ports:
+      - "9047:9047"   # Web UI / REST API
+      - "31010:31010" # JDBC/ODBC port
+      - "32010:32010" # ARROW Flight port
+      - "45678:45678" # Internal communication
+    environment:
+      - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dpaths.dist=file:///opt/dremio/data/dist
+    # volumes:
+    #   - ./dremio/dist:/opt/dremio/data/dist
+    #   - ./dremio/conf:/opt/dremio/conf
+
 
   ####################################################################################################
   # Trino
@@ -315,7 +336,7 @@ services:
   ####################################################################################################
   airflow-webserver:
     <<: *airflow-common
-    profiles: [ "airflow", "airflow-webserver" ]
+    profiles: [ "airflow"]
     container_name: lakehouse-playground-airflow-webserver
     command: webserver
     ports:
@@ -334,7 +355,7 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
-    profiles: [ "airflow", "airflow-scheduler" ]
+    profiles: [ "airflow" ]
     container_name: lakehouse-playground-airflow-scheduler
     command: scheduler
     healthcheck:
@@ -351,7 +372,7 @@ services:
 
   airflow-worker:
     <<: *airflow-common
-    profiles: [ "airflow", "airflow-worker" ]
+    profiles: [ "airflow" ]
     container_name: lakehouse-playground-airflow-worker
     command: celery worker
     healthcheck:
@@ -373,7 +394,7 @@ services:
 
   airflow-triggerer:
     <<: *airflow-common
-    profiles: [ "airflow", "airflow-triggerer" ]
+    profiles: [ "airflow-triggerer" ]
     container_name: lakehouse-playground-airflow-triggerer
     command: triggerer
     healthcheck:
@@ -390,8 +411,8 @@ services:
 
   airflow-cli:
     <<: *airflow-common
+    profiles: [ "airflow-debug" ]
     container_name: lakehouse-playground-airflow-cli
-    profiles: [ "airflow", "airflow-debug" ]
     environment:
       <<: *airflow-common-env
       CONNECTION_CHECK_MAX_COUNT: "0"
@@ -401,6 +422,7 @@ services:
       - -c
       - airflow
 
+  # To setup sources folder (dags, logs, plugins) permissions for airflow to read and run migrations
   airflow-init:
     <<: *airflow-common
     profiles: [ "airflow"]
@@ -421,10 +443,10 @@ services:
       _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
     volumes:
-      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - ${AIRFLOW_PROJ_DIR:-./airflow}:/sources
 
   redis:
-    profiles: [ "airflow" ]
+    profiles: [ "airflow", "airflow-debug" ]
     container_name: lakehouse-playground-redis
     hostname: redis
     image: redis:latest
