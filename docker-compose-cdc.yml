@@ -75,8 +75,8 @@ services:
   ####################################################################################################
   zk:
     <<: *zk-common
-    hostname: zk
     container_name: lakehouse-playground-zk
+    hostname: zk
     ports:
       - "2181:2181"
     environment:
@@ -96,10 +96,10 @@ services:
 
   kafka-schema-registry:
     image: confluentinc/cp-schema-registry:7.4.1
-    hostname: kafka-schema-registry
     container_name: lakehouse-playground-kafka-schema-registry
+    hostname: kafka-schema-registry
     ports:
-      - 8085:8085
+      - "8085:8085"
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka1:29092
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
@@ -115,8 +115,8 @@ services:
 
   kafka1:
     <<: *kafka-common
-    hostname: kafka1
     container_name: lakehouse-playground-kafka1
+    hostname: kafka1
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -142,8 +142,8 @@ services:
   kafka-ui:
     # profiles: [ "kafka" ]
     image: provectuslabs/kafka-ui
-    hostname: kafka-ui
     container_name: lakehouse-playground-kafka-ui
+    hostname: kafka-ui
     ports:
       - "8088:8080"
     # 환경 변수 설정

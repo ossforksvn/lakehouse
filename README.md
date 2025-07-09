@@ -19,7 +19,7 @@ Supported Data Pipeline Components
 
 <br/>
 
-## Getting Started
+## 1. Getting Started
 
 Execute compose containers first.
 
@@ -36,8 +36,9 @@ COMPOSE_PROFILES=trino,spark docker-compose up;
 # for CDC environment (Kafka, ZK, Debezium)
 make compose.clean compose.cdc
 
-# for Stream environment (Kafka, ZK, Debezium + Flink)
-make compose.clean compose.stream
+# for Stream environment (Kafka, ZK, Debezium) + (Spark/Flink)
+make compose.clean compose.stream.spark
+make compose.clean compose.stream.flink
 ```
 
 Then access the lakehouse services.
@@ -58,7 +59,7 @@ Then access the lakehouse services.
 
 <br/>
 
-## CDC Starter kit
+## 2. CDC Starter kit
 
 ```bash
 # Run cdc-related containers
@@ -88,7 +89,7 @@ After running the Local Flink Application, you can access the Flink Job Manager 
 ![idea](./docs/images/idea.png)
 
 
-## DBT Starter kit
+## 3. DBT Starter kit
 
 ```bash
 # Run trino-related containers
@@ -118,7 +119,7 @@ make airflow.shell;
 airflow dags backfill dag_dbt --local --reset-dagruns  -s 2022-09-02 -e 2022-09-03;
 ```
 
-## Screenshots
+## 4. Screenshots
 
 ### Flink Job Manager UI
 ![flink](./docs/images/flink.png)

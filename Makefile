@@ -49,15 +49,27 @@ compose.trino:
 
 .PHONY: compose.dbt
 compose.dbt:
-	COMPOSE_PROFILES=trino,airflow docker compose up
+	COMPOSE_PROFILES=airflow docker compose up
 
 .PHONY: compose.cdc
 compose.cdc:
-	COMPOSE_PROFILES=kafka docker compose -f docker-compose-cdc.yml up
+	docker compose -f docker-compose-cdc.yml up
 
-.PHONY: compose.stream
-compose.stream:
-	 COMPOSE_PROFILES=kafka docker compose -f docker-compose.yml -f docker-compose-cdc.yml up
+.PHONY: compose.stream.spark
+compose.stream.spark:
+	 COMPOSE_PROFILES=spark docker compose -f docker-compose-cdc.yml -f docker-compose.yml up
+
+.PHONY: compose.stream.spark.iceberg
+compose.stream.spark.iceberg:
+	 COMPOSE_PROFILES=spark-iceberg docker compose -f docker-compose-cdc.yml -f docker-compose.yml up
+
+.PHONY: compose.stream.spark.hudi
+compose.stream.spark.hudi:
+	 COMPOSE_PROFILES=spark-hudi docker compose -f docker-compose-cdc.yml -f docker-compose.yml up
+
+.PHONY: compose.stream.flink
+compose.stream.flink:
+	 COMPOSE_PROFILES=flink docker compose -f docker-compose-cdc.yml -f docker-compose.yml up
 
 .PHONY: compose.clean
 compose.clean:
