@@ -76,7 +76,7 @@ services:
   zk:
     <<: *zk-common
     hostname: zk
-    container_name: zk
+    container_name: lakehouse-playground-zk
     ports:
       - "2181:2181"
     environment:
@@ -97,7 +97,7 @@ services:
   kafka-schema-registry:
     image: confluentinc/cp-schema-registry:7.4.1
     hostname: kafka-schema-registry
-    container_name: kafka-schema-registry
+    container_name: lakehouse-playground-kafka-schema-registry
     ports:
       - 8085:8085
     environment:
@@ -116,7 +116,7 @@ services:
   kafka1:
     <<: *kafka-common
     hostname: kafka1
-    container_name: kafka1
+    container_name: lakehouse-playground-kafka1
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -124,9 +124,9 @@ services:
     environment:
       <<: *kafka-common-env
       KAFKA_BROKER_ID: 1
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:29092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
       KAFKA_JMX_PORT: 9997
-      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.rmi.port=9997
     healthcheck:
       test: nc -z localhost 9092 || exit -1
       start_period: 15s
@@ -143,7 +143,7 @@ services:
     # profiles: [ "kafka" ]
     image: provectuslabs/kafka-ui
     hostname: kafka-ui
-    container_name: kafka-ui
+    container_name: lakehouse-playground-kafka-ui
     ports:
       - "8088:8080"
     # 환경 변수 설정
@@ -169,7 +169,7 @@ services:
     # profiles: [ "kafka" ]
     image: mysql:5.7
     platform: linux/amd64
-    container_name: mysql
+    container_name: lakehouse-playground-mysql
     hostname: mysql
     ports:
       - "3306:3306"
@@ -200,7 +200,7 @@ services:
 
   kafka-connect-1:
     <<: *connect-common
-    container_name: kafka-connect-1
+    container_name: lakehouse-playground-kafka-connect-1
     hostname: kafka-connect-1
     ports:
       - "8083:8083"

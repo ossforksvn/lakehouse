@@ -45,19 +45,19 @@ debezium.register.products:
 
 .PHONY: compose.trino
 compose.trino:
-	COMPOSE_PROFILES=trino docker-compose up
+	COMPOSE_PROFILES=trino docker compose up
 
 .PHONY: compose.dbt
 compose.dbt:
-	COMPOSE_PROFILES=trino,airflow docker-compose up
+	COMPOSE_PROFILES=trino,airflow docker compose up
 
 .PHONY: compose.cdc
 compose.cdc:
-	COMPOSE_PROFILES=kafka docker-compose -f docker-compose-cdc.yml up
+	COMPOSE_PROFILES=kafka docker compose -f docker-compose-cdc.yml up
 
 .PHONY: compose.stream
 compose.stream:
-	 COMPOSE_PROFILES=kafka docker-compose -f docker-compose.yml -f docker-compose-cdc.yml up
+	 COMPOSE_PROFILES=kafka docker compose -f docker-compose.yml -f docker-compose-cdc.yml up
 
 .PHONY: compose.clean
 compose.clean:
